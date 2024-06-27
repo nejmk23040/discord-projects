@@ -308,12 +308,16 @@ async function sendMessage(token, channelId, message, mention) {
                     }
                 });
 
-                console.log(`Message sent successfully with token ${token}: ${message} to ${mention}`);
+                if (response.status === 200) {
+                    console.log(`Message sent successfully with token ${token}: ${message} to ${mention}`);
+                }
             } catch (error) {
                 if (error.response && error.response.status === 429) {
                     console.log(`Rate limit exceeded for token ${token}. Waiting for ${error.response.data.retry_after}ms and retrying...`);
                     await new Promise(resolve => setTimeout(resolve, error.response.data.retry_after));
                     await sendMessage(token, channelId, message, mention);
+                } else if (error.response && error.response.status === 401) {
+                    console.error(`Unauthorized (401) with token ${token}:`, error.response.data);
                 } else if (error.response && error.response.status === 400) {
                     console.error(`Bad Request (400) with token ${token}:`, error.response.data);
                 } else {
@@ -322,8 +326,8 @@ async function sendMessage(token, channelId, message, mention) {
             }
         }, 400);
     } catch (error) {
-        if (error.response && error.response.status === 400) {
-            console.error(`Bad Request (400) with token ${token}:`, error.response.data);
+        if (error.response && error.response.status === 401) {
+            console.error(`Unauthorized (401) with token ${token}:`, error.response.data);
         } else {
             console.error(`Failed to start typing with token ${token}:`, error.response ? error.response.data : error.message);
         }
