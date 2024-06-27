@@ -276,7 +276,6 @@ const messages = [
 
 ];
 
-
 function uptimeMonitor() {
     setInterval(() => {
         console.log(`Uptime: ${Math.floor(process.uptime())} seconds`);
@@ -293,7 +292,7 @@ async function sendMessage(token, channelId, message, mention) {
     try {
         await axios.post(`https://discord.com/api/v10/channels/${channelId}/typing`, {}, {
             headers: {
-                Authorization: `Bot ${token}`
+                Authorization: `${token}`
             }
         });
 
@@ -303,7 +302,7 @@ async function sendMessage(token, channelId, message, mention) {
                     content: `${mention} ${message}`
                 }, {
                     headers: {
-                        Authorization: `Bot ${token}`,
+                        Authorization: `${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -315,7 +314,7 @@ async function sendMessage(token, channelId, message, mention) {
                 if (error.response && error.response.status === 429) {
                     console.log(`Rate limit exceeded for token ${token}. Waiting for ${error.response.data.retry_after}ms and retrying...`);
                     await new Promise(resolve => setTimeout(resolve, error.response.data.retry_after));
-                    await sendMessage(token, channelId, message, mention);
+                    await sendMessage(token, channelId, message, mention); 
                 } else if (error.response && error.response.status === 401) {
                     console.error(`Unauthorized (401) with token ${token}:`, error.response.data);
                 } else if (error.response && error.response.status === 400) {
@@ -337,10 +336,12 @@ async function sendMessage(token, channelId, message, mention) {
 async function main() {
     const interval = 1200;
     while (true) {
-        for (const message of messages) {
-            await Promise.all(tokens.map(token => sendMessage(token, targetChannelId, message, mentionId)));
-            await new Promise(resolve => setTimeout(resolve, interval));
-        }
+        const randomMessageIndex = Math.floor(Math.random() * messages.length);
+        const randomMessage = messages[randomMessageIndex];
+
+        await Promise.all(tokens.map(token => sendMessage(token, targetChannelId, randomMessage, mentionId)));
+
+        await new Promise(resolve => setTimeout(resolve, interval));
     }
 }
 
@@ -367,8 +368,9 @@ app.get('/webview', (req, res) => {
 });
 
 server.listen(8080, () => {
-  console.log("Server is running on port 8080...");
-  uptimeMonitor();
-  keepAlive();
-  main();
+  console.log("ولكم بنيك كسم علاوي و لحن بزبي");
 });
+
+uptimeMonitor();
+keepAlive();
+main();
