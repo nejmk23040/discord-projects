@@ -276,6 +276,7 @@ const messages = [
 
 ];
 
+
 function uptimeMonitor() {
     setInterval(() => {
         console.log(`Uptime: ${Math.floor(process.uptime())} seconds`);
@@ -298,7 +299,7 @@ async function sendMessage(token, channelId, message, mention) {
 
         setTimeout(async () => {
             try {
-                const response = await axios.post(`https://discord.com/api/v810channels/${channelId}/messages`, {
+                const response = await axios.post(`https://discord.com/api/v10/channels/${channelId}/messages`, {
                     content: `${mention} ${message}`
                 }, {
                     headers: {
@@ -307,25 +308,25 @@ async function sendMessage(token, channelId, message, mention) {
                     }
                 });
 
-                if (response.status === 429) {
-                    console.log(`Rate limit exceeded for token ${token}. Waiting and retrying...`);
-                    await new Promise(resolve => setTimeout(resolve, response.data.retry_after));
-                    await sendMessage(token, channelId, message, mention);
-                } else {
-                    console.log(`Message sent successfully with token ${token}: ${message} to ${mention}`);
-                }
+                console.log(`Message sent successfully with token ${token}: ${message} to ${mention}`);
             } catch (error) {
                 if (error.response && error.response.status === 429) {
-                    console.log(`Rate limit exceeded for token ${token}. Waiting and retrying...`);
+                    console.log(`Rate limit exceeded for token ${token}. Waiting for ${error.response.data.retry_after}ms and retrying...`);
                     await new Promise(resolve => setTimeout(resolve, error.response.data.retry_after));
                     await sendMessage(token, channelId, message, mention);
+                } else if (error.response && error.response.status === 400) {
+                    console.error(`Bad Request (400) with token ${token}:`, error.response.data);
                 } else {
-                    console.error(`Failed to send message with token ${token}:`, error);
+                    console.error(`Failed to send message with token ${token}:`, error.response ? error.response.data : error.message);
                 }
             }
         }, 400);
     } catch (error) {
-        console.error(`Failed to start typing with token ${token}:`, error);
+        if (error.response && error.response.status === 400) {
+            console.error(`Bad Request (400) with token ${token}:`, error.response.data);
+        } else {
+            console.error(`Failed to start typing with token ${token}:`, error.response ? error.response.data : error.message);
+        }
     }
 }
 
