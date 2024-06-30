@@ -19,9 +19,9 @@ class AutoReplier {
         const userMessages = [];
         try {
             const headers = { 'authorization': token };
-            let url = https://discord.com/api/v10/channels/${channelId}/messages?limit=50;
+            let url = `https://discord.com/api/v10/channels/${channelId}/messages?limit=50`;
             if (this.lastCheckedMessageIds.has(channelId)) {
-                url += &after=${this.lastCheckedMessageIds.get(channelId)};
+                url += `&after=${this.lastCheckedMessageIds.get(channelId)}`;
             }
             const response = await this.session.get(url, { headers });
             const messages = response.data;
@@ -40,7 +40,7 @@ class AutoReplier {
                 this.lastCheckedMessageIds.set(channelId, messages[0].id);
             }
         } catch (error) {
-            console.error(An error occurred while fetching user messages from channel ${channelId}: ${error});
+            console.error(`An error occurred while fetching user messages from channel ${channelId}: ${error}`);
         }
         return userMessages;
     }
@@ -48,19 +48,19 @@ class AutoReplier {
     async replyToMessage(token, messageId, channelId, retryCount = 0) {
         try {
             const headers = { 'authorization': token };
-            await this.session.post(https://discord.com/api/v10/channels/${channelId}/typing, {}, { headers });
+            await this.session.post(`https://discord.com/api/v10/channels/${channelId}/typing`, {}, { headers });
             const currentMessage = this.messages[Math.floor(Math.random() * this.messages.length)];
             const replyPayload = {
                 content: currentMessage,
                 message_reference: { message_id: messageId }
             };
-            await this.session.post(https://discord.com/api/v10/channels/${channelId}/messages, replyPayload, { headers });
-            console.log(Replied to message ID ${messageId} in channel ${channelId} with: ${currentMessage});
+            await this.session.post(`https://discord.com/api/v10/channels/${channelId}/messages`, replyPayload, { headers });
+            console.log(`Replied to message ID ${messageId} in channel ${channelId} with: ${currentMessage}`);
         } catch (error) {
-            console.error(An error occurred: ${error});
+            console.error(`An error occurred: ${error}`);
             if (error.response && error.response.status === 429) {
                 const retryAfter = error.response.headers['retry-after'] || 10;
-                console.log(Rate limited. Retrying in ${retryAfter} seconds...);
+                console.log(`Rate limited. Retrying in ${retryAfter} seconds...`);
                 await new Promise(resolve => setTimeout(resolve, (parseInt(retryAfter) + 1) * 1000));
                 await this.replyToMessage(token, messageId, channelId, retryCount);
             } else if (retryCount < 3) {
@@ -68,7 +68,7 @@ class AutoReplier {
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 await this.replyToMessage(token, messageId, channelId, retryCount + 1);
             } else {
-                console.error(Failed to reply to message ID ${messageId} after 3 attempts.);
+                console.error(`Failed to reply to message ID ${messageId} after 3 attempts.`);
             }
         }
     }
@@ -95,22 +95,21 @@ async function replyToUsers(autoReplier) {
             }
         }
         await autoReplier.replyToMessagesFromAllTokens(allMessages);
-        await new Promise(resolve => setTimeout(resolve, 50)); 
+        await new Promise(resolve => setTimeout(resolve, 50));
     }
 }
 
 const tokens = [
-     "توكنك",
-  
+    "توكنك",
 ];
 const channelIds = [
     "ايدي الروم"
 ];
 const userIds = [
-    "ولد القحبة"
+    "ايدي ولد زبي",
 ];
 const messages = [
- 'شقمك', 
+  'شقمك',
   'حرقمك',
   'بصعمك', 
   'فتحمك', 
@@ -344,7 +343,7 @@ const messages = [
  'غريمك', 
  'غرق ابوك', 
  'وفاة اخوك', 
- 'نيكمك بزب رانغو الفرار', 
+ 'نيكمك بزب دارك و لحن الفرار', 
  'نايك كسمك و الي مشعل فيه النار', 
  'نيك ربك يبن الجرار', 
  'انيك كسختمك يبن الفار', 
@@ -379,28 +378,28 @@ const app = express();
 const server = http.createServer(app);
 
 app.get('/', (req, res) => {
-  res.send(
-    <body>
-      <center><h1>كسمك يا علاوي</h1></center>
-    </body>
-  );
+    res.send(`
+        <body>
+            <center><h1>كسمك يا علاوي</h1></center>
+        </body>
+    `);
 });
 
 app.get('/webview', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(
-    <html>
-      <head>
-        <title>كسمك يا لحن</title>
-      </head>
-      <body style="margin: 0; padding: 0;">
-        <iframe width="100%" height="100%" src="https://axocoder.vercel.app/" frameborder="0" allowfullscreen></iframe>
-      </body>
-    </html>
-  );
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`
+        <html>
+            <head>
+                <title>كسمك يا لحن</title>
+            </head>
+            <body style="margin: 0; padding: 0;">
+                <iframe width="100%" height="100%" src="https://axocoder.vercel.app/" frameborder="0" allowfullscreen></iframe>
+            </body>
+        </html>
+    `);
 });
 
 server.listen(8080, () => {
-  console.log("I'm ready to nik ksm 3lawi..!");
-  console.log('I'm ready to nik ksm l7n..!');
+    console.log("I'm ready to nik ksm 3lawi..!");
+    console.log('Im ready to nik ksm l7n..!');
 });
