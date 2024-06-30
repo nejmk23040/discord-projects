@@ -5,12 +5,12 @@ const http = require('http');
   
 const tokens = [
  
-                "توكن1",
-                "توكن2"
+  "توكن1",
+  "توكن2"
 ];
 
 const targetUsers = [
-   "ابن القحبة"
+  "ابن القحبة"
  ]; 
 const targetChannels = [
  
