@@ -11,7 +11,7 @@ class AutoReplier {
         this.messages = messages;
         this.lastProcessedMessageIds = new Map();
         this.lastCheckedMessageIds = new Map();
-        this.limiter = new Bottleneck({ maxConcurrent: tokens.length, minTime: 50 });
+        this.limiter = new Bottleneck({ maxConcurrent: tokens.length, minTime: 100 });
         this.session = axios.create();
     }
 
@@ -62,11 +62,11 @@ class AutoReplier {
                 const retryAfter = error.response.headers['retry-after'] || 10;
                 console.log(`Rate limited. Retrying in ${retryAfter} seconds...`);
                 await new Promise(resolve => setTimeout(resolve, (parseInt(retryAfter) + 1) * 1000));
-                this.replyToMessage(token, messageId, channelId, retryCount);
+                await this.replyToMessage(token, messageId, channelId, retryCount);
             } else if (retryCount < 3) {
                 console.log('Retrying in 10 seconds...');
                 await new Promise(resolve => setTimeout(resolve, 10000));
-                this.replyToMessage(token, messageId, channelId, retryCount + 1);
+                await this.replyToMessage(token, messageId, channelId, retryCount + 1);
             } else {
                 console.error(`Failed to reply to message ID ${messageId} after 3 attempts.`);
             }
@@ -95,26 +95,22 @@ async function replyToUsers(autoReplier) {
             }
         }
         await autoReplier.replyToMessagesFromAllTokens(allMessages);
-        await new Promise(resolve => setTimeout(resolve, 100)); 
+        await new Promise(resolve => setTimeout(resolve, 200)); 
     }
 }
 
 const tokens = [
-
-    "توكن1",
-    "توكن2",
-
+     "توكنك",
+  
 ];
 const channelIds = [
-    "ايدي القروب1",
-    "ايدي القروب2"
+    "ايدي الروم"
 ];
 const userIds = [
-     "1ولد زبي",
-     "2ولد زبي"
+    "ولد القحبة"
 ];
 const messages = [
-  'شقمك', 
+      'شقمك', 
   'حرقمك',
   'بصعمك', 
   'فتحمك', 
@@ -375,8 +371,8 @@ const messages = [
  'تنزيل المعجزات على راسمك', 
  'خبط كسمك بالباب يبن العطاية', 
  'نيك ربمك يبن الحلاب', 
-
 ];
+
 const autoReplier = new AutoReplier(tokens, channelIds, userIds, messages);
 replyToUsers(autoReplier);
 
@@ -406,6 +402,6 @@ app.get('/webview', (req, res) => {
 });
 
 server.listen(8080, () => {
-  console.log("im ready to nik ksm 3lawi..!");
-  console.log('im ready to nik ksm l7n..!');
+  console.log("I'm ready to nik ksm 3lawi..!");
+  console.log('I'm ready to nik ksm l7n..!');
 });
