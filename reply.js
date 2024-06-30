@@ -11,7 +11,7 @@ class AutoReplier {
         this.messages = messages;
         this.lastProcessedMessageIds = new Map();
         this.lastCheckedMessageIds = new Map();
-        this.limiter = new Bottleneck({ maxConcurrent: tokens.length, minTime: 100 });
+        this.limiter = new Bottleneck({ maxConcurrent: tokens.length, minTime: 50 });
         this.session = axios.create();
     }
 
@@ -95,7 +95,7 @@ async function replyToUsers(autoReplier) {
             }
         }
         await autoReplier.replyToMessagesFromAllTokens(allMessages);
-        await new Promise(resolve => setTimeout(resolve, 200)); 
+        await new Promise(resolve => setTimeout(resolve, 50)); 
     }
 }
 
