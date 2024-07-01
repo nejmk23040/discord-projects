@@ -2,25 +2,74 @@ const { Client, Intents } = require('discord.js-selfbot-v13');
 const express = require('express');
 const http = require('http');
 
-  
+class AutoReplier {
+    constructor(tokens, channelIds, userIds, messages, delay) {
+        this.tokens = tokens;
+        this.channelIds = channelIds;
+        this.userIds = userIds;
+        this.messages = messages;
+        this.delay = delay;
+        this.clients = tokens.map(token => new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }));
+    }
+
+    async startClients() {
+        for (const [index, client] of this.clients.entries()) {
+            client.once('ready', () => {
+                console.log(`Bot logged in as ${client.user.tag}`);
+            });
+
+            client.on('messageCreate', async (message) => {
+                if (this.channelIds.includes(message.channel.id) && this.userIds.includes(message.author.id)) {
+                    await this.replyToMessage(client, message);
+                }
+            });
+
+            client.on('error', (error) => {
+                console.error('Client encountered an error:', error);
+            });
+
+            await client.login(this.tokens[index]);
+        }
+    }
+
+    async replyToMessage(client, message, retryCount = 0) {
+        try {
+            const currentMessage = this.messages[Math.floor(Math.random() * this.messages.length)];
+            await new Promise(resolve => setTimeout(resolve, this.delay));
+            await message.reply(currentMessage);
+            console.log(`Replied to message ID ${message.id} in channel ${message.channel.id} with: ${currentMessage}`);
+        } catch (error) {
+            console.error(`An error occurred: ${error}`);
+            if (error.code === 429) {
+                console.log('Rate limited! Waiting before retrying...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                await this.replyToMessage(client, message, retryCount);
+            } else if (retryCount < 5) {
+                console.log('Retrying in 5 seconds...');
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                await this.replyToMessage(client, message, retryCount + 1);
+            } else {
+                console.error(`Failed to reply to message ID ${message.id} after 5 attempts.`);
+            }
+        }
+    }
+}
+
+const delay = 20;
+
 const tokens = [
- 
-  "توكن1",
-  "توكن2"
+  'توكنك'
 ];
 
-const targetUsers = [
-  "ابن القحبة"
- ]; 
-const targetChannels = [
- 
-  "الروم"
-  
+const channelIds = [
+  'ايدي الروم'
 ];
-const delayBetweenReplies = 20;
 
-const randomReplies = [ 
-      
+const userIds = [
+  'ولد زبي'
+];
+
+const messages = [
   'شقمك', 
   'حرقمك',
   'بصعمك', 
@@ -283,75 +332,36 @@ const randomReplies = [
  'خبط كسمك بالباب يبن العطاية', 
  'نيك ربمك يبن الحلاب', 
 
-
-
 ];
- 
-const clients = tokens.map(token => {
-  const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
-  });
 
-  client.once('ready', () => {
-    console.log(`Logged in as ${client.user.tag}`);
-  });
-
-  client.on('messageCreate', async (message) => {
-    if (!targetUsers.includes(message.author.id) || !targetChannels.includes(message.channel.id)) return;
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, delayBetweenReplies));
-
-      const randomReply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
-      const replyMessage = await message.reply(randomReply);
-
-      console.log(`Replied to message: ${replyMessage.content}`);
-    } catch (error) {
-      console.error(`Error replying to message: ${error}`);
-
-      
-      if (error.code === 429) {
-        console.log('Rate limited! Waiting before retrying...');
-        await new Promise(resolve => setTimeout(resolve, 1000)); 
-      }
-    }
-  });
-
-  client.on('error', (error) => {
-    console.error('Client encountered an error:', error);
-    
-  });
-
-  client.login(token);
-  return client;
-});
+const autoReplier = new AutoReplier(tokens, channelIds, userIds, messages, delay);
+autoReplier.startClients();
 
 const app = express();
 const server = http.createServer(app);
 
 app.get('/', (req, res) => {
-  res.send(`
-    <body>
-      <center><h1>كسمك يا علاوي</h1></center>
-    </body>
-  `);
+    res.send(`
+        <body>
+            <center><h1>كسمك ي لحن</h1></center>
+        </body>
+    `);
 });
 
 app.get('/webview', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(`
-    <html>
-      <head>
-        <title>كسمك يا لحن</title>
-      </head>
-      <body style="margin: 0; padding: 0;">
-        <iframe width="100%" height="100%" src="https://axocoder.vercel.app/" frameborder="0" allowfullscreen></iframe>
-      </body>
-    </html>
-  `);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`
+        <html>
+            <head>
+                <title>كسمك ي علاوي</title>
+            </head>
+            <body style="margin: 0; padding: 0;">
+                <iframe width="100%" height="100%" src="https://example.com/" frameborder="0" allowfullscreen></iframe>
+            </body>
+        </html>
+    `);
 });
 
 server.listen(8080, () => {
-  console.log("I'm ready to nik ksm 3lawi..!");
-  console.log("I'm ready to nik ksm l7n..!");
+    console.log("im ready to nik ksm 3lawi");
 });
