@@ -1,4 +1,4 @@
-const { Client, Intents } = require('discord.js-selfbot-v13');
+const { Client } = require('discord.js-selfbot-v13');
 const express = require('express');
 const http = require('http');
 
@@ -9,7 +9,7 @@ class AutoReplier {
         this.userIds = userIds;
         this.messages = messages;
         this.delay = delay;
-        this.clients = tokens.map(token => new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }));
+        this.clients = tokens.map(token => new Client());
     }
 
     async startClients() {
@@ -58,20 +58,20 @@ class AutoReplier {
 const delay = 20;
 
 const tokens = [
-  'توكنك'
+   'توكنك'
 ];
 
 const channelIds = [
-  'ايدي الروم'
+  'ايدي الروم',            
 ];
 
 const userIds = [
-  'ولد زبي'
+     'ولد لقحبة',
 ];
 
 const messages = [
   'شقمك', 
-  'حرقمك',
+   'حرقمك',
   'بصعمك', 
   'فتحمك', 
   'بحوي كسم الي جابتك', 
@@ -332,8 +332,8 @@ const messages = [
  'خبط كسمك بالباب يبن العطاية', 
  'نيك ربمك يبن الحلاب', 
 
-];
 
+];
 const autoReplier = new AutoReplier(tokens, channelIds, userIds, messages, delay);
 autoReplier.startClients();
 
